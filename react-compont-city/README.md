@@ -1,5 +1,7 @@
 [gitHub地址](https://github.com/Dranein/react-study/tree/master/react-compont-city)
 
+**预览图**
+![预览图](https://github.com/Dranein/react-study/blob/master/img/react_city.jpg?raw=true)
 
 **新建项目**
 
