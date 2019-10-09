@@ -1,7 +1,8 @@
-## react 城市选择组件
 [gitHub地址](https://github.com/Dranein/react-study/tree/master/react-compont-city)
 
+
 **新建项目**
+
 这里使用的cli是 [Create React App](https://github.com/facebook/create-react-app)
 
 npm init react-app react-compont-city
@@ -11,6 +12,7 @@ npm start
 删除掉一些没有用到的文件和注释
 
 **在项目中我们添加一下依赖**
+
 -- package.json  （添加之后记得npm install一下哦）
 ```json
 "@better-scroll/core": "^2.0.0-alpha.19",  // 滚动插件
@@ -18,6 +20,7 @@ npm start
 ```
 
 **目录结构**
+
 * src
     * components
         * City.js   *-组件的入口文件*
@@ -35,6 +38,7 @@ npm start
 
 
 我们将City组件在App.js中引入
+
 -- App.js
 ```javascript
 import React from 'react';
@@ -52,6 +56,7 @@ export default App;
 ```
 
 将我们的三个模块添加到City中
+
 -- City.js
 ```javascript
 import React from 'react';
@@ -77,7 +82,7 @@ export default class City extends React.Component {
 到此就把整个结构整理完了，接下来逐个模块来实现
 
 
-##### Header.js
+### Header.js
 -- Header.js
 ```javascript
 import React from 'react';
@@ -115,7 +120,7 @@ render() {
 // ...
 ```
 
-##### 获取城市列表
+### 获取城市列表
 城市列表的获取在City.js中完成，我们在public中新建一个有城市数据的json文件 city.json
 
 * 然后用fetch模拟请求城市数据
@@ -168,7 +173,7 @@ export default class City extends React.Component {
 https://www.jianshu.com/p/2f6d81a15d81)
 以及componentDidMount和后续用到的componentDidUpdate函数   [React 组件生命周期](https://www.runoob.com/react/react-component-life-cycle.html)
 
-##### List.js
+### List.js
 城市列表分为两个部分，热门城市和城市列表
 分别为`list.hotCities`和`list.cities`
 为了更加清晰的展示，我们将这两块分开
@@ -217,7 +222,7 @@ render() {
   }
 }
 ```
-##### 使用better-scroll让List.js可以滑动起来
+### 使用better-scroll让List.js可以滑动起来
 -- List.js
 ```javascript
 import BScroll from '@better-scroll/core' //引入better-scroll
@@ -235,9 +240,12 @@ componentDidUpdate(prevProps, prevState) {
 在componentDidUpdate周期中我们初始化 better-scroll，传入List组件最外层的css（'.city-list'）
 
 
-##### Alphabet.js
+### Alphabet.js
 Alphabet是城市选择组件的右边字母列模块，我们要实现点击已经滑动来让List滚动到指定的位置
 
-###### 未完待续
+## 未完待续
 
 
+[gitHub地址](https://github.com/Dranein/react-study/tree/master/react-compont-city)
+
+联系：dranein@163.com
