@@ -1,68 +1,243 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## react 城市选择组件
+[gitHub地址](https://github.com/Dranein/react-study/tree/master/react-compont-city)
 
-## Available Scripts
+**新建项目**
+这里使用的cli是 [Create React App](https://github.com/facebook/create-react-app)
 
-In the project directory, you can run:
+npm init react-app react-compont-city
+cd react-compont-city
+npm start
 
-### `npm start`
+删除掉一些没有用到的文件和注释
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+**在项目中我们添加一下依赖**
+-- package.json  （添加之后记得npm install一下哦）
+```json
+"@better-scroll/core": "^2.0.0-alpha.19",  // 滚动插件
+"node-sass": "^4.12.0",  // sass支持
+```
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+**目录结构**
+* src
+    * components
+        * City.js   *-组件的入口文件*
+        * City.scss * -组件样式文件*
+        * components  *+存放city模块组件文件夹*
+            *  Header.js
+            *  List.js
+            *  Alphabet.js
+    * App.js
 
-### `npm test`
+这里我们将整个城市选择组件划分为三个部分：
+* 顶部（Header）
+* 列表（List）
+* 右边字母列（Alphabet）
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+我们将City组件在App.js中引入
+-- App.js
+```javascript
+import React from 'react';
+import './App.css';
+import City from './components/city/City';
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function App() {
+  return (
+    <div className="App">
+        <City></City>
+    </div>
+  );
+}
+export default App;
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+将我们的三个模块添加到City中
+-- City.js
+```javascript
+import React from 'react';
+import './city.scss';
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+import Header from './components/Header'
+import List from './components/List'
+import Alphabet from './components/Alphabet'
 
-### `npm run eject`
+export default class City extends React.Component {
+    render() {
+        return (
+            <div className="city">
+                <Header />
+                <List />
+                <Alphabet />
+            </div>
+        );
+    }
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+到此就把整个结构整理完了，接下来逐个模块来实现
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+##### Header.js
+-- Header.js
+```javascript
+import React from 'react';
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+export default class Header extends React.Component {
+  render() {
+    return (
+      <div className="city-header">
+        <div className="city-header-top">
+          <div className="city-header-back" onClick={this.props.handleBack}>返回</div>城市选择
+        </div>
+      </div>
+    );
+  }
+}
+```
+顶部模块比较简单，左边一个返回键，中间一个title
+返回的事件我们在父级City中处理，所以直接触发父级传入的方法 `handleBack`
 
-## Learn More
+-- City.js
+```javascript
+// ...
+handleBack(){
+    console.log('返回') //这里我们没有做路由，先直接console返回
+}
+render() {
+    return (
+        <div className="city">
+            <Header handleBack={this.handleBack.bind(this)}/>
+            <List />
+            <Alphabet />
+        </div>
+    );
+}
+// ...
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+##### 获取城市列表
+城市列表的获取在City.js中完成，我们在public中新建一个有城市数据的json文件 city.json
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* 然后用fetch模拟请求城市数据
+* 将城市数据传入给List组件
+* 并传入一个城市点击事件handleChangeCity
 
-### Code Splitting
+-- City.js
+```javascript
+// ...
+export default class City extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            cityList: []
+        }
+    }
+    componentDidMount() {
+        this.getCityList();
+    }
+    getCityList() {
+        fetch('city.json').then((res) => {
+            return res.json();
+        }).then((res) => {
+            this.setState({
+                cityList: res.data
+            })
+        })
+    }
+    handleBack(){
+        console.log('返回')
+    }
+    handleChangeCity(item) {
+       console.log(item)
+    }
+    render() {
+        return (
+            <div className="city">
+                <Header handleBack={this.handleBack.bind(this)} />
+                <List
+                    list={this.state.cityList} 
+                    handleChangeCity={this.handleChangeCity.bind(this)} />
+                <Alphabet />
+            </div>
+        );
+    }
+}
+```
+在getCityList()中请求城市数据，并传入List组件
+这里涉及到props和state，可以先了解一下两者的区别 [react中的state和props](
+https://www.jianshu.com/p/2f6d81a15d81)
+以及componentDidMount和后续用到的componentDidUpdate函数   [React 组件生命周期](https://www.runoob.com/react/react-component-life-cycle.html)
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+##### List.js
+城市列表分为两个部分，热门城市和城市列表
+分别为`list.hotCities`和`list.cities`
+为了更加清晰的展示，我们将这两块分开
+onClick事件点击触发父级City传入的handleChangeCity，并将该城市信息带过去
+-- List.js
+```javascript
+// ...
+render() {
+    let objlist = this.props.list.cities || [];
+    let objHotlist = this.props.list.hotCities || [];
+    let handleChangeCity = this.props.handleChangeCity;
+    let html_HotList = (
+      <div className="city-list-block">
+        <div className="city-list-title">热门城市</div>
+        <div className="city-list-buttonWarpper">
+          {objHotlist.map(item =>
+            <div
+              key={'hot'+item.id}
+              className="city-list-button"
+              onClick={handleChangeCity.bind(this, item)}>{item.name}</div>
+          )}
+        </div>
+      </div>
+    )
+    let html_cityList = (
+      Object.keys(objlist).map(key =>
+        <div ref={key} key={key} className="city-list-block">
+          <div className="city-list-title">{key}</div>
+          {objlist[key].map(item =>
+            <div
+              key={item.id}
+              className="city-list-item"
+              onClick={handleChangeCity.bind(this, item)}>{item.name}</div>
+          )}
+        </div>
+      )
+    )
+    return (
+      <div className="city-list scroll_wrapper">
+        <div className="content">
+          {html_HotList}
+          {html_cityList}
+        </div>
+      </div>
+    );
+  }
+}
+```
+##### 使用better-scroll让List.js可以滑动起来
+-- List.js
+```javascript
+import BScroll from '@better-scroll/core' //引入better-scroll
 
-### Analyzing the Bundle Size
+//...
+componentDidUpdate(prevProps, prevState) {
+    if (prevProps.list !== this.props) {
+        new BScroll('.city-list', {
+            click: true
+        });
+    }
+}
+ //...
+```
+在componentDidUpdate周期中我们初始化 better-scroll，传入List组件最外层的css（'.city-list'）
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-### Making a Progressive Web App
+##### Alphabet.js
+Alphabet是城市选择组件的右边字母列模块，我们要实现点击已经滑动来让List滚动到指定的位置
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+###### 未完待续
 
-### Advanced Configuration
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
