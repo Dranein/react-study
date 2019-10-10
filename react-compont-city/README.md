@@ -50,7 +50,7 @@ import City from './components/city/City';
 function App() {
   return (
     <div className="App">
-        <City></City>
+      <City></City>
     </div>
   );
 }
@@ -202,7 +202,10 @@ render() {
     )
     let html_cityList = (
       Object.keys(objlist).map(key =>
-        <div ref={key} key={key} className="city-list-block">
+        <div 
+          ref={key} // key为首字母，将key作为ref，后续使用
+          key={key} 
+          className="city-list-block">
           <div className="city-list-title">{key}</div>
           {objlist[key].map(item =>
             <div
@@ -231,11 +234,9 @@ import BScroll from '@better-scroll/core' //引入better-scroll
 
 //...
 componentDidUpdate(prevProps, prevState) {
-    if (prevProps.list !== this.props) {
-        new BScroll('.city-list', {
-            click: true
-        });
-    }
+    let scrollObj = new BScroll('.city-list', {
+      click: true
+    });
 }
  //...
 ```
@@ -243,8 +244,113 @@ componentDidUpdate(prevProps, prevState) {
 
 
 ### Alphabet.js
-Alphabet是城市选择组件的右边字母列模块，我们要实现点击已经滑动来让List滚动到指定的位置
+Alphabet是城市选择组件的右边字母列模块，我们要实现 **点击** 或者 **滑动** 来让List滚动到指定的位置
 
+* better-scroll提供了一个方法scrollToElement，滚动到指定的dom，参数为该dom
+
+伪代码为：
+```
+const el = this.refs[Alphabet中返回的key];  // this.refs[dom的ref]可以获取该节点
+better-scroll实例.scrollToElement(el);
+```
+
+* 我们在`Alphabet`中给每个字母添加点击方法，返回该字母，对应到`List`中的列表，在之前已经将key作为ref传入
+
+
+
+
+-- City.js
+```javascript
+import BScroll from '@better-scroll/core' //引入better-scroll
+
+//...
+constructor(props) {
+    super(props);
+    this.state = {
+        cityList: [],
+        curKey: '' // 新增一个curKey，传入List，指定滚动位置
+    }
+}
+
+//...
+
+handleAlphabetClick (key) { //Alphabet中的点击事件，返回字母key
+    if (key !== this.state.curKey) {
+      this.setState({
+        curKey: key
+      })
+    }
+}
+render() {
+    let keyList = this.state.cityList.cities && Object.keys(this.state.cityList.cities);
+    // keyList  当cityList.cities存在的时候，我们用keys获取列表中的key，获取字母列表，可以看一下city.json的数据结构
+    return (
+        <div className="city">
+            <Header handleBack={this.handleBack.bind(this)} />
+            <List
+                list={this.state.cityList}
+                curKey={this.state.curKey} // 新增curKey，指定当前滚动位置
+                handleChangeCity={this.handleChangeCity.bind(this)} />
+            <Alphabet 
+                list={keyList}  //传入list
+                onClick={this.handleAlphabetClick.bind(this)} /> // 传入字母表点击事件
+        </div>
+    );
+}
+```
+-- Alphabet.js
+```javascript
+import React from 'react';
+
+export default class Alphabet extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    handleClick(key) {
+        this.props.onClick(key);
+    }
+    render() {
+        let objlist = this.props.list || [];
+        return (
+            <div className="city-alphabet">
+                <ul>
+                    {objlist.map(item =>
+                        <li
+                            key={item}
+                            className="city-alphabet-item"
+                            onClick={this.handleClick.bind(this, item)} >{item}</li>
+                    )}
+                </ul>
+            </div>
+        );
+    }
+}
+```
+-- List.js
+```javascript
+//...
+componentDidUpdate() {
+    let scrollObj = new BScroll('.city-list', {
+        click: true
+    });
+    if (scrollObj && this.props.curKey) {
+        // 父级是否有传递字母过来，有的话需要滚动到相应的未知
+        const ele = this.refs[this.props.curKey];
+        scrollObj.scrollToElement(ele);
+    }
+}
+ //...
+```
+这里点击滚动就结束了，我们在右边的字母表点击字母，对应的list就会滚动到相应的位置
+
+#### 滑动字母表触发list滚动
+
+接下来实现滑动，实际上就是监听字母表的tauch事件，在滑动的时候获取key值并返回
+
+-- Alphabet.js
+```javascript
+
+```
 ## 未完待续
 
 
