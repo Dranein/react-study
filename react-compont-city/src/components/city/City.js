@@ -9,7 +9,8 @@ export default class City extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-      cityList: []
+      cityList: [],
+      curKey: ''
     }
 	}
   componentDidMount() {
@@ -30,14 +31,25 @@ export default class City extends React.Component {
   handleChangeCity(item) {
     console.log(item)
   }
+  handleAlphabetClick (key) {
+    if (key !== this.state.curKey) {
+      this.setState({
+        curKey: key
+      })
+    }
+  }
 	render() {
+    let keyList = this.state.cityList.cities && Object.keys(this.state.cityList.cities);
 		return (
 			<div className="city">
         <Header handleBack={this.handleBack.bind(this)} />
         <List
           list={this.state.cityList} 
+          curKey={this.state.curKey}
           handleChangeCity={this.handleChangeCity.bind(this)} />
-        <Alphabet />
+        <Alphabet 
+          list={keyList} 
+          onClick={this.handleAlphabetClick.bind(this)} />
       </div>
 		);
 	}

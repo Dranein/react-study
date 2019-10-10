@@ -2,12 +2,18 @@ import React from 'react';
 import BScroll from '@better-scroll/core'
 
 export default class List extends React.Component {
-	componentDidUpdate(prevProps, prevState) {
-		if (prevProps.list !== this.props) {
-			new BScroll('.city-list', {
-	      click: true
-	    });
-		}
+  constructor(props) {
+    super(props);
+  }
+	componentDidUpdate() {
+    let scrollObj = new BScroll('.city-list', {
+      click: true
+    });
+    if (scrollObj && this.props.curKey) {
+      // 父级是否有传递字母过来，有的话需要滚动到相应的未知
+      const ele = this.refs[this.props.curKey];
+      scrollObj.scrollToElement(ele);
+    }
   }
 	render() {
     let objlist = this.props.list.cities || [];
